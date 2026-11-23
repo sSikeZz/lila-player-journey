@@ -1,0 +1,57 @@
+{
+ "maps": [
+  {
+   "id": "AmbroseValley",
+   "image": "minimaps/AmbroseValley.webp",
+   "scale": 900,
+   "ox": -370,
+   "oz": -473,
+   "matches": 566,
+   "dates": [
+    "2026-02-10",
+    "2026-02-11",
+    "2026-02-12",
+    "2026-02-13",
+    "2026-02-14"
+   ]
+  },
+  {
+   "id": "GrandRift",
+   "image": "minimaps/GrandRift.webp",
+   "scale": 581,
+   "ox": -290,
+   "oz": -290,
+   "matches": 59,
+   "dates": [
+    "2026-02-10",
+    "2026-02-11",
+    "2026-02-12",
+    "2026-02-13",
+    "2026-02-14"
+   ]
+  },
+  {
+   "id": "Lockdown",
+   "image": "minimaps/Lockdown.webp",
+   "scale": 1000,
+   "ox": -500,
+   "oz": -500,
+   "matches": 171,
+   "dates": [
+    "2026-02-10",
+    "2026-02-11",
+    "2026-02-12",
+    "2026-02-13",
+    "2026-02-14"
+   ]
+  }
+ ],
+ "events": {
+  "Kill": 0,
+  "Killed": 1,
+  "BotKill": 2,
+  "BotKilled": 3,
+  "KilledByStorm": 4,
+  "Loot": 5
+ }
+}
