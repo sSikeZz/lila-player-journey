@@ -220,9 +220,31 @@ code {
   font-size: 11px;
 }
 
-.matches {
+.match-list {
+  max-height: 34vh;
+  min-height: 140px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 3px;
+  background: var(--bg);
+}
+.sidebar section:last-child {
+  border-bottom: 0;
+}
+.heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.heat-legend .bar {
   flex: 1;
-  border-bottom: 0 !important;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(40, 120, 255, 0.5), #3cdcbe 35%, #ffe13c 65%, #ff3228);
 }
 .list-ctl {
   justify-content: space-between;

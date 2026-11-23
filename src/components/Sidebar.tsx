@@ -44,8 +44,10 @@ const MAP_LABEL: Record<string, string> = {
   Lockdown: 'Lockdown',
 };
 
-const combat = (m: Match) =>
-  (m.counts.Kill ?? 0) + (m.counts.BotKill ?? 0) + (m.counts.Killed ?? 0) + (m.counts.BotKilled ?? 0) + (m.counts.KilledByStorm ?? 0);
+const kills = (m: Match) => (m.counts.Kill ?? 0) + (m.counts.BotKill ?? 0);
+const deaths = (m: Match) => (m.counts.Killed ?? 0) + (m.counts.BotKilled ?? 0);
+const combat = (m: Match) => kills(m) + deaths(m) + (m.counts.KilledByStorm ?? 0);
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 export function Sidebar({ ui, set, maps, matches, stats, heatSamples }: Props) {
   const meta = maps.find((m) => m.id === ui.mapId);
@@ -110,6 +112,62 @@ export function Sidebar({ ui, set, maps, matches, stats, heatSamples }: Props) {
         </div>
       </section>
 
+      <section className="matches">
+        <h2>
+          Matches <span className="muted">{matches ? `${matches.length}` : '…'}</span>
+        </h2>
+        <div className="row list-ctl">
+          <select value={ui.sort} onChange={(e) => set({ sort: e.target.value as SortKey })} aria-label="Sort matches">
+            <option value="time">Newest first</option>
+            <option value="combat">Most combat</option>
+            <option value="duration">Longest</option>
+            <option value="players">Most journeys</option>
+          </select>
+          <label className="toggle small" title="Most matches only contain a single player's file">
+            <input type="checkbox" checked={ui.multiOnly} onChange={(e) => set({ multiOnly: e.target.checked, matchId: null })} />
+            2+ journeys only
+          </label>
+        </div>
+        <ul className="match-list">
+          <li className={ui.matchId === null ? 'sel all' : 'all'} onClick={() => set({ matchId: null })}>
+            <b>All matches</b>
+            <span className="muted">aggregate view</span>
+          </li>
+          {sorted.map((m) => (
+            <li key={m.id} className={ui.matchId === m.id ? 'sel' : ''} onClick={() => set({ matchId: m.id })}>
+              <div className="m-top">
+                <span>
+                  {fmtDate(m.date)} · {fmtUtc(m.start)}
+                </span>
+                <span className="muted">{fmtClock(m.dur)}</span>
+              </div>
+              <div className="m-bot">
+                <span style={{ color: HUMAN_COLOR }}>{m.humans}H</span>
+                {m.bots > 0 && <span style={{ color: BOT_COLOR }}>{m.bots}B</span>}
+                {kills(m) > 0 && <span className="pill k">{plural(kills(m), 'kill')}</span>}
+                {deaths(m) > 0 && <span className="pill d">{plural(deaths(m), 'death')}</span>}
+                {(m.counts.KilledByStorm ?? 0) > 0 && <span className="pill s">storm</span>}
+                <code className="muted">{m.id.slice(0, 6)}</code>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="stats">
+        <div>
+          <b>{stats.matches}</b>
+          <span>matches</span>
+        </div>
+        <div>
+          <b>{pct(stats.humansSurvived, stats.humans)}</b>
+          <span>humans survived</span>
+        </div>
+        <div>
+          <b>{stats.eventCounts[4] ?? 0}</b>
+          <span>storm deaths</span>
+        </div>
+      </section>
+
       <section>
         <h2>Show</h2>
         <label className="row toggle">
@@ -160,6 +218,11 @@ export function Sidebar({ ui, set, maps, matches, stats, heatSamples }: Props) {
         </div>
         {ui.heat !== 'off' && (
           <>
+            <div className="heat-legend" aria-label="Heatmap scale: low to high">
+              <span>Low</span>
+              <span className="bar" />
+              <span>High</span>
+            </div>
             <p className="hint">{HEAT_KINDS.find((h) => h.kind === ui.heat)?.hint}. Respects all filters &amp; the timeline.</p>
             <label className="row slider">
               Opacity
@@ -176,66 +239,6 @@ export function Sidebar({ ui, set, maps, matches, stats, heatSamples }: Props) {
         )}
       </section>
 
-      <section className="stats">
-        <div>
-          <b>{stats.matches}</b>
-          <span>matches</span>
-        </div>
-        <div>
-          <b>{pct(stats.humansSurvived, stats.humans)}</b>
-          <span>humans survived</span>
-        </div>
-        <div>
-          <b>{stats.eventCounts[4] ?? 0}</b>
-          <span>storm deaths</span>
-        </div>
-      </section>
-
-      <section className="matches">
-        <h2>
-          Matches <span className="muted">{matches ? `${matches.length}` : '…'}</span>
-        </h2>
-        <div className="row list-ctl">
-          <select value={ui.sort} onChange={(e) => set({ sort: e.target.value as SortKey })} aria-label="Sort matches">
-            <option value="time">Newest first</option>
-            <option value="combat">Most combat</option>
-            <option value="duration">Longest</option>
-            <option value="players">Most journeys</option>
-          </select>
-          <label className="toggle small" title="Most matches only contain a single player's file">
-            <input type="checkbox" checked={ui.multiOnly} onChange={(e) => set({ multiOnly: e.target.checked, matchId: null })} />
-            2+ journeys only
-          </label>
-        </div>
-        <ul className="match-list">
-          <li className={ui.matchId === null ? 'sel all' : 'all'} onClick={() => set({ matchId: null })}>
-            <b>All matches</b>
-            <span className="muted">aggregate view</span>
-          </li>
-          {sorted.map((m) => (
-            <li key={m.id} className={ui.matchId === m.id ? 'sel' : ''} onClick={() => set({ matchId: m.id })}>
-              <div className="m-top">
-                <span>
-                  {fmtDate(m.date)} · {fmtUtc(m.start)}
-                </span>
-                <span className="muted">{fmtClock(m.dur)}</span>
-              </div>
-              <div className="m-bot">
-                <span style={{ color: HUMAN_COLOR }}>{m.humans}H</span>
-                {m.bots > 0 && <span style={{ color: BOT_COLOR }}>{m.bots}B</span>}
-                {(m.counts.BotKill ?? 0) + (m.counts.Kill ?? 0) > 0 && (
-                  <span className="pill k">{(m.counts.BotKill ?? 0) + (m.counts.Kill ?? 0)} kills</span>
-                )}
-                {(m.counts.Killed ?? 0) + (m.counts.BotKilled ?? 0) > 0 && (
-                  <span className="pill d">{(m.counts.Killed ?? 0) + (m.counts.BotKilled ?? 0)} deaths</span>
-                )}
-                {(m.counts.KilledByStorm ?? 0) > 0 && <span className="pill s">storm</span>}
-                <code className="muted">{m.id.slice(0, 6)}</code>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
     </aside>
   );
 }

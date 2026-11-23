@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "data": ".venv/bin/python pipeline/build_data.py --src ../player_data --out public"
+    "data": ".venv/bin/python pipeline/build_data.py --src ../player_data --out public",
+    "test": "node --test \"src/**/*.test.ts\" && .venv/bin/python -m unittest discover -s pipeline"
   },
   "dependencies": {
     "react": "^18.3.1",

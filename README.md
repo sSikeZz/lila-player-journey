@@ -8,6 +8,10 @@ A browser tool for Level Designers to explore how players move, fight, loot and 
 - [INSIGHTS.md](INSIGHTS.md): three findings made with the tool
 - [WALKTHROUGH.md](WALKTHROUGH.md): a 5-minute feature tour
 
+![Replaying one match: each human has their own colour, bots are dashed orange, and the roster shows who died and when](docs/replay.jpg)
+
+![All 566 Ambrose Valley matches with the Deaths heatmap: deaths concentrate on the central compound](docs/heatmap.jpg)
+
 ## What it does
 
 | Feature | How |
@@ -51,6 +55,20 @@ python3 -m venv .venv
 
 `--src` should point at the unzipped `player_data/` folder, which contains the `February_*` folders and `minimaps/`. `npm run data` assumes it sits next to this repo.
 
+### Tests
+
+```bash
+npm test
+```
+
+This runs 10 checks:
+- **The coordinate mapping:** the README's sample point lands at pixel (78, 890), and the world origin lands at the bottom-left corner.
+- **Pipeline cleanup:** `ts` is read as Unix seconds, the event bytes are decoded, and duplicate rows are dropped.
+- **Bot detection by telemetry:** a numeric ID that sends `Position` data counts as a human and gets flagged.
+- **How a drawn path is put together:** movement samples and event spots are merged in time order.
+
+It needs Node 22.6+ and the Python venv described above.
+
 ### Environment variables
 
 None. The app is fully static.
@@ -66,12 +84,14 @@ None. The app is fully static.
 pipeline/
   build_data.py      parquet -> cleaned, mapped, compact JSON + resized minimaps
   insights.py        stats behind INSIGHTS.md
+  test_build_data.py pipeline tests (mapping, timestamps, duplicates, bot detection)
 public/
   data/              generated JSON (index + one file per map)
   minimaps/          generated 2048² webp minimaps
 src/
   App.tsx            state, filtering, playback loop, URL hash
-  data.ts            types, event styles, loaders
+  data.ts            types, event styles, loaders, path/event merge
+  data.test.ts       tests for the path/event merge
   render.ts          canvas drawing: paths, markers, heads, grid
   heatmap.ts         density grid + blur + colour ramp
   components/        MapView (pan/zoom/hover), Sidebar, Timeline, Roster, MarkerIcon

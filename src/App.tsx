@@ -150,7 +150,7 @@ export default function App() {
   const heatT = t >= tMax ? tMax : Math.ceil(t / 2) * 2;
   const heat = useMemo(() => buildHeat(refs, ui.heat, heatT), [refs, ui.heat, heatT]);
 
-  // ---- stats for what's on screen (up to time t)
+  // ---- totals for the current filters (whole match, independent of the timeline)
   const stats: Stats = useMemo(() => {
     const eventCounts: Record<number, number> = {};
     let humans = 0;

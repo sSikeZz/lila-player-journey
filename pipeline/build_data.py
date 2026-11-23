@@ -82,7 +82,8 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
 
     # `ts` is typed timestamp[ms] but the stored integers are Unix *seconds*
     # (1_770_727_161 -> 2026-02-10). Read the raw integer and treat it as seconds.
-    df["ts"] = df["ts"].astype("int64")
+    # Cast to ms resolution first so the raw integer is right whatever unit pandas picked.
+    df["ts"] = df["ts"].astype("datetime64[ms]").astype("int64")
 
     before = len(df)
     df = df.drop_duplicates(subset=["file", "ts", "event", "x", "y", "z"]).copy()

@@ -52,8 +52,7 @@ export function MapView({ image, refs, focus, t, showPaths, markerOn, heat, heat
     const im = new Image();
     im.onload = () => setImg(im);
     im.src = image;
-    fit();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fit(); // re-fit only when the map image changes, not on every resize
   }, [image]);
 
   // draw
@@ -165,16 +164,30 @@ export function MapView({ image, refs, focus, t, showPaths, markerOn, heat, heat
         <button title="Fit map" onClick={fit}>⤢</button>
       </div>
       {focus && <Roster refs={refs} t={t} />}
-      {tip && <Tooltip x={tip.x} y={tip.y} hit={tip.hit} />}
+      {tip && <Tooltip x={tip.x} y={tip.y} hit={tip.hit} flipX={tip.x > size.w - 300} flipY={tip.y > size.h - 100} />}
     </div>
   );
 }
 
-function Tooltip({ x, y, hit }: { x: number; y: number; hit: Hit }) {
+interface TipProps {
+  x: number;
+  y: number;
+  hit: Hit;
+  /** open to the left / above the cursor so it never gets clipped at the map edge */
+  flipX: boolean;
+  flipY: boolean;
+}
+
+function Tooltip({ x, y, hit, flipX, flipY }: TipProps) {
   const st = EVENT_BY_CODE[hit.code];
   const { j, match } = hit.ref;
+  const style = {
+    left: flipX ? x - 14 : x + 14,
+    top: flipY ? y - 14 : y + 14,
+    transform: `translate(${flipX ? '-100%' : '0'}, ${flipY ? '-100%' : '0'})`,
+  };
   return (
-    <div className="tooltip" style={{ left: x + 14, top: y + 14 }}>
+    <div className="tooltip" style={style}>
       <div className="tooltip-title" style={{ color: st.color }}>{st.label}</div>
       <div>
         {j.bot ? 'Bot' : 'Human'} <code>{shortId(j.id)}</code>
