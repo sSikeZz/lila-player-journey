@@ -501,6 +501,9 @@ select {
   grid-column: 3;
   font-size: 11px;
 }
+.has-host-badge .timeline {
+  padding-right: 230px;
+}
 
 .fatal {
   padding: 40px;
@@ -521,6 +524,10 @@ select {
   }
   .timeline {
     grid-template-columns: auto 1fr;
+  }
+  .has-host-badge .timeline {
+    padding-right: 16px;
+    padding-bottom: 56px;
   }
   .timeline .clock {
     display: none;

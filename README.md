@@ -2,7 +2,7 @@
 
 A browser tool for Level Designers to explore how players move, fight, loot and die on LILA BLACK's maps. It uses 5 days of production telemetry (Feb 10–14, 2026).
 
-**Live:** _<deployed URL goes here>_
+**Live:** https://lila-player-journeys.netlify.app
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): stack, data flow, coordinate mapping, assumptions, trade-offs
 - [INSIGHTS.md](INSIGHTS.md): three findings made with the tool
